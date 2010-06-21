@@ -43,6 +43,9 @@ Warbler::Config.new do |config|
   # functionality, uncomment here.
   # config.bundler = false
 
+  # Exclude this Bundler gem groups when finding gems to bundle
+  # config.bundler_without_groups << "test"
+
   # Files for WEB-INF directory (next to web.xml). This contains
   # web.xml by default. If there is an .erb-File it will be processed
   # with webxml-config. You may want to exclude this file via

@@ -77,6 +77,9 @@ module Warbler
     # Use Bundler to locate gems if Gemfile is found. Default is true.
     attr_accessor :bundler
 
+    # Bundler groups to not bundle. Default is empty.
+    attr_accessor :bundler_without_groups
+
     # Path to the pre-bundled gem directory inside the war file. Default is '/WEB-INF/gems'.
     # This also sets 'gem.path' inside web.xml.
     attr_accessor :gem_path
@@ -127,6 +130,7 @@ module Warbler
       @rails_root  = File.expand_path(defined?(RAILS_ROOT) ? RAILS_ROOT : Dir.getwd)
       @war_name    = File.basename(@rails_root)
       @bundler     = true
+      @bundler_without_groups = []
       @webinf_files = default_webinf_files
       auto_detect_frameworks
       yield self if block_given?
@@ -202,6 +206,9 @@ module Warbler
         @gem_dependencies = false # Bundler takes care of these
         begin
           require 'bundler'
+
+          Bundler.settings.without = @bundler_without_groups.map {|g| g.to_sym}
+
           env = Bundler::Runtime.new(Bundler.root, Bundler.definition)
           if bundler_env_file = Bundler.respond_to?(:env_file)
             class << Bundler

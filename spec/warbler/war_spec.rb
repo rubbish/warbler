@@ -422,6 +422,20 @@ describe Warbler::War do
     hash[:load_paths].each {|p| File.exist?(p).should be_true }
   end
 
+  it "should detect a Bundler Gemfile and process only its gems" do
+    File.open("Gemfile", "w") do |f|
+      f << <<-EOG
+gem 'rake'
+gem 'rspec', :group => :test
+EOG
+    end
+
+    @war.apply(Warbler::Config.new {|c| c.bundler_without_groups << "test"})
+    file_list(%r{WEB-INF/Gemfile}).should_not be_empty
+    file_list(%r{WEB-INF/gems/specifications/rspec}).should be_empty
+    file_list(%r{WEB-INF/gems/specifications/rake}).should_not be_empty
+  end
+
   it "should allow adding additional WEB-INF files via config.webinf_files" do
     File.open("myserver-web.xml", "w") do |f|
       f << "<web-app></web-app>"
